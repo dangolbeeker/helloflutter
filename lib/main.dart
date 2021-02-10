@@ -4,31 +4,62 @@ import 'package:english_words/english_words.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  // #docregion build
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Welcome to my App',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Welcome to My App'),
-        ),
-        body: Center(
-          child: RandomWords(),
-        ),
+      title: 'Startup Name Generator',
+      home: RandomWords(),
+    );
+  }
+  // #enddocregion build
+}
+// #enddocregion MyApp
+
+// #docregion RWS-var
+class _RandomWordsState extends State<RandomWords> {
+  final _suggestions = <WordPair>[];
+  final _biggerFont = TextStyle(fontSize: 18.0);
+  // #enddocregion RWS-var
+
+  // #docregion _buildSuggestions
+  Widget _buildSuggestions() {
+    return ListView.builder(
+        padding: EdgeInsets.all(16.0),
+        itemBuilder: /*1*/ (context, i) {
+          if (i.isOdd) return Divider(); /*2*/
+
+          final index = i ~/ 2; /*3*/
+          if (index >= _suggestions.length) {
+            _suggestions.addAll(generateWordPairs().take(10)); /*4*/
+          }
+          return _buildRow(_suggestions[index]);
+        });
+  }
+
+  Widget _buildRow(WordPair pair) {
+    return ListTile(
+      title: Text(
+        pair.asPascalCase,
+        style: _biggerFont,
       ),
+    );
+  }
+
+  //build() method to use _buildSuggestions(),
+  //rather than directly calling the word generation library.
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Startup Name Generator'),
+      ),
+      body: _buildSuggestions(),
     );
   }
 }
 
 class RandomWords extends StatefulWidget {
   @override
-  _RandomWordsState createState() => _RandomWordsState();
-}
-
-class _RandomWordsState extends State<RandomWords> {
-  @override
-  Widget build(BuildContext context) {
-    final wordPair = WordPair.random();
-    return Text(wordPair.asPascalCase);
-  }
+  State<RandomWords> createState() => _RandomWordsState();
 }
